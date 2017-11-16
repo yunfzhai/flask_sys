@@ -15,27 +15,19 @@ $(function () {
     var legend={layout: 'vertical',
                 align: 'right',
                 verticalAlign: 'middle'};
-    // var xAxis = {categories:[] };
     var tooltip={shared: true,     crosshairs: true};
     var hcjson = {};
-
+    hcjson.tooltip=tooltip;
+    hcjson.legend=legend;    
+    hcjson.subtitle=subtitle;
     var mytable = $('#users').DataTable( );
 
     function updatechart(data)
     {   
-        xd=[];d1=[];d2=[];
-        for (var i=0;i<data.length;i++){
-            xd.push(data[i][0]);
-            d1.push(data[i][1]);
-            d2.push(data[i][2]);
-        }
+
         hcjson.title = title;
-        hcjson.subtitle=subtitle;
-        hcjson.legend=legend;
-        hcjson.tooltip=tooltip;
-        hcjson.xAxis={categories:xd};
-        // console.log(hcjson);
-        hcjson.series=[{name:'d1',data:d1},{name:'d2',data:d2}];
+        hcjson.xAxis={categories:data.date};
+        hcjson.series=[{name:'rate',data:data.rate},{name:'rate2',data:data.rate2}];
         $('#container').highcharts(hcjson);
     }
 
@@ -43,7 +35,6 @@ $(function () {
     function updateDataTables(users)
     {
         mytable.clear();
-        // console.log(users);
         mytable.rows.add(users);
         mytable.draw();
     }
@@ -54,7 +45,7 @@ $(function () {
         {
             // console.log(data.test);
             updateDataTables(data.test);
-            updatechart(data.data2);
+            updatechart(data.data2t);
             
         })
     }

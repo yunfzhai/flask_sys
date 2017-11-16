@@ -2,6 +2,7 @@ from flask import Flask, render_template, make_response, jsonify,g,url_for
 from functools import wraps
 from flask_cache import Cache
 from qpython import qconnection as qc
+import numpy as np
 
 app=Flask(__name__)
 
@@ -10,12 +11,8 @@ app=Flask(__name__)
 app.config['SECRET_KEY']='!@$RFGAVASDGAQQQ'
 cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
-# connection_string = u'mssql+pymssql://sa:yslstryhhh@sql2k8cluster\mssql2k8/factormodel'
-# engine = sqlalchemy.create_engine(connection_string)
-
 def connect_db():
     """Connects to the specific database."""
-    # q = qc.QConnection(host='10.0.16.106', port=8866, pandas=True)
     q = qc.QConnection(host='10.0.16.106', port=8866)
     q.open()
     return q
@@ -35,9 +32,6 @@ def close_db(error):
         g.q_db.close()
         print('q connection down!')
 
-
-
-
 def allow_cross_domain(fun):
     @wraps(fun)
     def wrapper_fun(*args, **kwargs):
@@ -54,17 +48,17 @@ def allow_cross_domain(fun):
 @cache.cached(timeout=2, key_prefix='random')
 def datatest():
     q=get_db()
-    zdata=q.sync('0!rand[.1]+1!select  from f4table[`.zall;2017.12.31;2017.01.01;2017.12.31]')
-    zdata2= [list(g) for g in zdata]
-    for m in zdata2:
-        m[0] = str(m[0],encoding="utf-8")
+    t1=q.sync('0!rand[.1]+1!select  from f4table[`.zall;2017.12.31;2017.01.01;2017.12.31]',pandas=True)
+    t1.fac=[str(x,encoding='utf-8') for x in t1.fac]
+    t1.iloc[:,1:]=np.around(t1.iloc[:,1:],3)    
+    t11 = [list(g) for g in t1.values]  #横着用
 
-    pldata= q.sync('100#update rate2:-1+prds 1+rate2 from lj[;1!select date,rate2:rate from .zall.fggBPO ] select date,rate:-1+prds 1+rate from .zall.fgBPO where date>=2017.01.01',numpy_temporals = True)
-    pldata2 = [list(g) for g in pldata]
-    for m in pldata2:
-        m[0] = ''.join(m[0].astype(str).split("-"))
-
-    data= { 'test':zdata2, 'data2':pldata2 }
+    t2= q.sync('update rate2:-1+prds 1+rate2 from lj[;1!select date,rate2:rate from .zall.fggBPO ] select date,rate:-1+prds 1+rate from .zall.fgBPO where date>=2017.01.01',numpy_temporals = True)
+    data2={}
+    data2['date'] = [''.join(x.astype(str).split("-")) for x in t2.date]
+    data2['rate'] = list(np.around(t2.rate,3)) #竖着用
+    data2['rate2'] = list(np.around(t2.rate2,3))
+    data= { 'test':t11,'data2t':data2}
     return jsonify(data)
 
 @app.route('/test/')
