@@ -3,9 +3,7 @@ from functools import wraps
 from flask_cache import Cache
 from qpython import qconnection as qc
 import numpy as np
-
 app=Flask(__name__)
-
 
 # app configuration
 app.config['SECRET_KEY']='!@$RFGAVASDGAQQQ'
@@ -13,14 +11,12 @@ cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
 def connect_db():
     """Connects to the specific database."""
-    q = qc.QConnection(host='10.0.16.106', port=8866)
+    q = qc.QConnection(host='localhost', port=8866)
     q.open()
     return q
 
 def get_db():
-    """Opens a new database connection if there is none yet for the
-    current application context.
-    """
+    """Opens a new database connection if there is none yet for the current application context."""
     if not hasattr(g, 'q_db'):
         g.q_db = connect_db()
     return g.q_db
@@ -32,23 +28,23 @@ def close_db(error):
         g.q_db.close()
         print('q connection down!')
 
-def allow_cross_domain(fun):
-    @wraps(fun)
-    def wrapper_fun(*args, **kwargs):
-        rst = make_response(fun(*args, **kwargs))
-        rst.headers['Access-Control-Allow-Origin'] = '*'
-        rst.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
-        allow_headers = "Referer,Accept,Origin,User-Agent"
-        rst.headers['Access-Control-Allow-Headers'] = allow_headers
-        return rst
-    return wrapper_fun
+# def allow_cross_domain(fun):
+#     @wraps(fun)
+#     def wrapper_fun(*args, **kwargs):
+#         rst = make_response(fun(*args, **kwargs))
+#         rst.headers['Access-Control-Allow-Origin'] = '*'
+#         rst.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
+#         allow_headers = "Referer,Accept,Origin,User-Agent"
+#         rst.headers['Access-Control-Allow-Headers'] = allow_headers
+#         return rst
+#     return wrapper_fun
 
 @app.route('/wtf/wtf/dtest/wtf')
-@allow_cross_domain
-@cache.cached(timeout=2, key_prefix='random')
+# @allow_cross_domain
+# @cache.cached(timeout=2, key_prefix='random')
 def datatest():
     q=get_db()
-    t1=q.sync('0!rand[.1]+1!select  from f4table[`.zall;2017.12.31;2017.01.01;2017.12.31]',pandas=True)
+    t1=q.sync('f4table[`.zall;2017.12.31;2017.01.01;2017.12.31]',pandas=True)
     t1.fac=[str(x,encoding='utf-8') for x in t1.fac]
     t1.iloc[:,1:]=np.around(t1.iloc[:,1:],3)    
     t11 = [list(g) for g in t1.values]  #横着用
@@ -58,6 +54,7 @@ def datatest():
     data2['date'] = [''.join(x.astype(str).split("-")) for x in t2.date]
     data2['rate'] = list(np.around(t2.rate,3)) #竖着用
     data2['rate2'] = list(np.around(t2.rate2,3))
+
     data= { 'test':t11,'data2t':data2}
     return jsonify(data)
 
