@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Highcharts Example</title>
+        <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="http://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+        <style type="text/css">${demo.css}</style>
+        <script type="text/javascript">
+
+$(function () {
+    var chart=  Highcharts.chart('container', 
+         {
+    title: {
+        text: '新数据累计收益率'
+         },
+    subtitle: {
+        text: '数据来源：qinvest'
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+    xAxis:{  
+            
+            categories:[]  
+        }, 
+    series:[{},{}]
+
+         }   
+        );
+
+    var mytable = $('#users').DataTable(
+        // {
+        //     "sScrollX": "100%",
+        //     "sScrollXInner": "110%"
+        //     // "bScrollCollapse": true
+        //     } 
+        );
+
+    function updatechart(data)
+    {   
+        d1=[];d2=[];
+        for (var i=0;i<data.length;i++){
+            chart.xAxis[0].categories.push(data[i][0]);
+            d1.push(data[i][1]);
+            d2.push(data[i][2]);
+        }
+        var series = chart.series;
+        // chart.series.push({});
+        // chart.series.push({});
+        chart.series[0].setData( d1);
+        chart.series[1].setData( d2);
+        chart.redraw(false);
+    }
+
+
+    function updateDataTables(users)
+    {
+        mytable.clear();
+        // console.log(users);
+        mytable.rows.add(users);
+        mytable.draw();
+    }
+
+    function update()
+    {
+        $.get("{{ url_for('index') }}", function(data)
+        {
+            // console.log(data.test);
+            updateDataTables(data.test);
+            updatechart(data.data2);
+            
+        })
+    }
+
+    $(document).ready(function () {
+
+        // window.setInterval(update, 1000);
+        update();
+
+    });
+});
+    </script>
+    </head>
+    
+<body>
+<script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+<script src="http://cdn.hcharts.cn/highcharts/modules/exporting.js"></script>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+      
+<table id="users" class="display" autoWidth="true">
+    <thead>
+    <tr> {% for name in names %}
+        <th> {{ name }}</th>
+        {%endfor%}
+    </tr>
+    </thead>
+</table>
+
+</body>
+
+</html>

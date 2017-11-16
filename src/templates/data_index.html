@@ -1,0 +1,22 @@
+<!-- data_index.htmal -->
+{% extends "base.html" %}
+
+{% block title %}Flasky_data{% endblock %}
+
+{% block page_content %}
+ <button class="btn1">get string_btn1</button>
+ fuck
+{% endblock %}
+
+
+{% block js_content %}
+<script>
+$(document).ready(function(){
+	$(".btn1").click(function(){
+		$.get("/test/mystring",function(data, status){
+			alert("数据: " + data + "\n状态: " + status);
+		});
+	});
+ });
+</script>
+{% endblock %}

@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Highcharts Example</title>
+        <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="http://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+        <style type="text/css">${demo.css}</style>
+        <script type="text/javascript">
+
+$(function () {
+    var title = { text: '某因子累计收益率' };
+    var subtitle={ text: '数据来源：qinvest'};
+    var legend={layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'};
+    // var xAxis = {categories:[] };
+    var tooltip={shared: true,     crosshairs: true};
+    var hcjson = {};
+
+    var mytable = $('#users').DataTable( );
+
+    function updatechart(data)
+    {   
+        xd=[];d1=[];d2=[];
+        for (var i=0;i<data.length;i++){
+            xd.push(data[i][0]);
+            d1.push(data[i][1]);
+            d2.push(data[i][2]);
+        }
+        hcjson.title = title;
+        hcjson.subtitle=subtitle;
+        hcjson.legend=legend;
+        hcjson.tooltip=tooltip;
+        hcjson.xAxis={categories:xd};
+        // console.log(hcjson);
+        hcjson.series=[{name:'d1',data:d1},{name:'d2',data:d2}];
+        $('#container').highcharts(hcjson);
+    }
+
+
+    function updateDataTables(users)
+    {
+        mytable.clear();
+        // console.log(users);
+        mytable.rows.add(users);
+        mytable.draw();
+    }
+
+    function update()
+    {
+        $.get("{{ url_for('datatest') }}", function(data)
+        {
+            // console.log(data.test);
+            updateDataTables(data.test);
+            updatechart(data.data2);
+            
+        })
+    }
+
+    $(document).ready(function () {
+
+        // window.setInterval(update, 1000);
+        update();
+
+    });
+});
+    </script>
+    </head>
+    
+<body>
+<script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+<script src="http://cdn.hcharts.cn/highcharts/modules/exporting.js"></script>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+      
+<table id="users" class="display" autoWidth="true">
+    <thead>
+    <tr> {% for name in names %}
+        <th> {{ name }}</th>
+        {%endfor%}
+    </tr>
+    </thead>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+    <script type="text/javascript">
+          var chart ;
+      $(function (){
+        chart = new Highcharts.Chart({
+            chart: { 
+            renderTo: 'container'
+          },
+          title: {
+            text: '?',
+          },
+          xAxis: {
+            categories: []
+          },
+          yAxis: {
+            title: {
+              text: '数据'
+            },
+          },
+          series: []
+        });
+      });
+      function show(){
+        var trs = $('table tr');
+        var datas=[];
+        var map={};
+        for(var i=1;i<trs.length;i++){
+             var nams = $('td:first',trs[i]).html();
+             var value = $('td:last',trs[i]).html();
+             if(typeof map[nams]=='undefined'){
+                 var pos = datas.length;
+                 map[nams] = pos;
+                 datas[pos]={name:nams,data:[]};
+             }
+             datas[map[nams]]["data"].push(Number(value));
+        }
+        var series=chart.series; 
+        if(series.length > 0){
+          series[0].remove(false); 
+       }
+       var d = datas[0];
+       chart.addSeries(d);//设置数据,danielinbiti
+       chart.setTitle({text:d.name});//设置标题 commend by danielinbiti
+       chart.redraw();
+      }
+    </script>
+    <script type="text/javascript">
+      $(function () {
+        new Highcharts.Chart({
+             chart: { 
+            renderTo: 'container2'
+          },
+          title: {
+            text: '链球菌毒素O',
+          },
+          xAxis: {
+            categories: []
+          },
+          yAxis: {
+
+            title: {
+              text: '数据'
+            },
+          },
+          series: [{
+            name: 'SBASO',
+            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+          }]
+        });
+      });
+    </script>
+  </head>
+  <body>
+     <input type='button' onclick='show()' value='显示表格数据'/>
+    <h1>曲线图</h1>
+    <!-- 第一个空图 -->
+    <div id="container" style="width:300px;height:300px;float:left;"></div>
+    <!-- 第二个有数据的图 -->
+    <div id="container2" style="width:300px;height:300px;float:left;"></div>
+    <table border="1" align="left">
+      <tr>
+        <td>CName</td>
+        <td>EName</td>
+        <td>Time</td>
+        <td>Date</td>        
+      </tr>
+      <tr>
+        <td>血小板</td>
+        <td>HPLT</td>
+        <td>1</td>
+        <td>7.0</td>        
+      </tr>
+      <tr>
+        <td>血小板</td>
+        <td>HPLT</td>
+        <td>2</td>
+        <td>6.9</td>        
+      </tr>
+      <tr>
+        <td>血小板</td>
+        <td>HPLT</td>
+        <td>3</td>
+        <td>9.5</td>        
+      </tr>
+    </table>
+  </body>
+</html
