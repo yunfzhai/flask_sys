@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>Highcharts Example</title>
+        <title>Highcharts Example 2</title>
         <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="http://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
         <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
@@ -10,68 +10,43 @@
         <script type="text/javascript">
 
 $(function () {
-    var chart=  Highcharts.chart('container', 
-         {
-    title: {
-        text: '新数据累计收益率'
-         },
-    subtitle: {
-        text: '数据来源：qinvest'
-    },
-    legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle'
-    },
-    xAxis:{  
-            
-            categories:[]  
-        }, 
-    series:[{},{}]
-
-         }   
-        );
-
-    var mytable = $('#users').DataTable(
-        // {
-        //     "sScrollX": "100%",
-        //     "sScrollXInner": "110%"
-        //     // "bScrollCollapse": true
-        //     } 
-        );
+    var title = { text: '某因子累计收益率' };
+    var subtitle={ text: '数据来源：qinvest'};
+    var legend={layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'};
+    var tooltip={shared: true,     crosshairs: true};
+    var hcjson = {};
+    hcjson.tooltip=tooltip;
+    hcjson.legend=legend;    
+    hcjson.subtitle=subtitle;
+    var mytable = $('#users').DataTable( );
 
     function updatechart(data)
     {   
-        d1=[];d2=[];
-        for (var i=0;i<data.length;i++){
-            chart.xAxis[0].categories.push(data[i][0]);
-            d1.push(data[i][1]);
-            d2.push(data[i][2]);
-        }
-        var series = chart.series;
-        // chart.series.push({});
-        // chart.series.push({});
-        chart.series[0].setData( d1);
-        chart.series[1].setData( d2);
-        chart.redraw(false);
+
+        hcjson.title = title;
+        hcjson.xAxis={categories:data.date};
+        hcjson.series=[{name:'rate',data:data.rate},{name:'rate2',data:data.rate2}];
+        $('#container').highcharts(hcjson);
     }
 
 
     function updateDataTables(users)
     {
         mytable.clear();
-        // console.log(users);
         mytable.rows.add(users);
         mytable.draw();
     }
 
     function update()
     {
-        $.get("{{ url_for('index') }}", function(data)
+        $.get("{{ url_for('datatest') }}", function(data)
         {
-            // console.log(data.test);
+            console.log(data.test);
+            window.alert(data.test);
             updateDataTables(data.test);
-            updatechart(data.data2);
+            updatechart(data.data2t);
             
         })
     }

@@ -43,28 +43,59 @@ $(function () {
     {
         $.get("{{ url_for('datatest') }}", function(data)
         {
-            // console.log(data.test);
+            console.log(data.test);
+            window.alert(data.test);
             updateDataTables(data.test);
             updatechart(data.data2t);
             
         })
     }
 
-    $(document).ready(function () {
+    $("#btn").click(function(){
 
-        // window.setInterval(update, 1000);
-        update();
+                $.ajax({
+                url:"{{ url_for('update_table') }}",
+                type:'POST',
+                // data:data,
+                data:{
+                	 rng: $('#rng').val(),
+            		 type: $('#type').val(),
+            		 checkdate: $('#checkdate').val(),
+            		 fmdate: $('#fmdate').val(),
+            		 eddate: $('#eddate').val(),
+                },
+                dataType: 'json',
+                success:function(data){
+                    updateDataTables(data.test);  
+                    $( "#thefuck" ).text( data.thefuck );                   
+                    // window.alert(data.test);
+                }
 
-    });
+            })
+            // return false; //?????????????
+        });
+
 });
-    </script>
+    </script> 
     </head>
     
 <body>
 <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
 <script src="http://cdn.hcharts.cn/highcharts/modules/exporting.js"></script>
-<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-      
+
+<div>
+ update table:<br />     
+
+            <input type="text" id="rng" placeholder=".zall" value=".zall" > <br />
+            <input type="text" id="type" placeholder="f4table" value="f4table"> <br />
+            <input type="text" id="checkdate" placeholder="2017.12.01" value="2017.12.01"> <br />
+            <input type="text" id="fmdate" placeholder="2017.01.01" value="2017.01.01"> <br />
+            <input type="text" id="eddate" placeholder="2017.12.01" value="2017.12.01"> <br />
+            <input type="submit" id="btn" value="显示表格">
+
+</div>
+ <p>LOG -->: <span id="thefuck"></span></p>  
+
 <table id="users" class="display" autoWidth="true">
     <thead>
     <tr> {% for name in names %}
@@ -73,6 +104,9 @@ $(function () {
     </tr>
     </thead>
 </table>
+
+
+
 
 </body>
 
