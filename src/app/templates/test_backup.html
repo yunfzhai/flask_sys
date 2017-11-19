@@ -43,8 +43,8 @@ $(function () {
     {
         $.get("{{ url_for('datatest') }}", function(data)
         {
-            console.log(data.test);
-            window.alert(data.test);
+            // console.log(data.test);
+            // window.alert(data.test);
             updateDataTables(data.test);
             updatechart(data.data2t);
             

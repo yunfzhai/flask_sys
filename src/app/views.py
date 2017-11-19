@@ -1,14 +1,8 @@
-from flask import Flask, render_template, make_response, jsonify,g,url_for,redirect,request,flash
-from functools import wraps
-from flask_cache import Cache
 from qpython import qconnection as qc
 import numpy as np
-import json
-app=Flask(__name__)
+from flask import  render_template, make_response, jsonify,g,url_for,redirect,request,flash
+from app import app
 
-# app configuration
-app.config['SECRET_KEY']='!@$RFGAVASDGAQQQ'
-cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
 def connect_db():
     """Connects to the specific database."""
@@ -75,7 +69,7 @@ def update_table():
 # @cache.cached(timeout=2, key_prefix='random')
 def datatest():
     q=get_db()
-    t1=q.sync('2#f4table[`.zall;2017.12.31;2017.01.01;2017.12.31]',pandas=True)
+    t1=q.sync('f4table[`.zall;2017.12.31;2017.01.01;2017.12.31]',pandas=True)
     t1.fac=[str(x,encoding='utf-8') for x in t1.fac]
     t1.iloc[:,1:]=np.around(t1.iloc[:,1:],3)    
     t11 = [list(g) for g in t1.values]  #横着用
@@ -96,6 +90,3 @@ def test():
 @app.route('/test2/')
 def test2():
     return render_template('test_backup.html',names=['因子名称','最近5日','d10','d20','d60','d120','d240','dfu'])    
-
-if __name__ == '__main__':
-    app.run(debug=True)
